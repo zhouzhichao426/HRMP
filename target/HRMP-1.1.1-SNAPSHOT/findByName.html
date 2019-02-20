@@ -1,0 +1,14 @@
+<div>
+    <ul>
+        <li ng-repeat="emp in emps">
+            <p id="empno">empno:{{emp.empno}}</p>
+            <p>ename:{{emp.ename}}</p>
+            <p>sal:{{emp.sal}}</p>
+            <p>
+                <button id="updateBtn" ng-click="upd(emp)">鏇存柊</button>
+                <button id="deleteBtn" ng-click="del(emp.empno)">鍒犻櫎</button>
+            </p>
+            <hr/>
+        </li>
+    </ul>
+</div>

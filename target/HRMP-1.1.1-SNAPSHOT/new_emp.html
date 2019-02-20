@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>新员工添加页</title>
+</head>
+
+<body>
+<h1>请输入新员工信息</h1>
+<table>
+    <tr>
+        <td>员工号</td>
+        <td><input type="text" name="empno" id="empno"></td>
+    </tr>
+    <tr>
+        <td>员工名</td>
+        <td><input type="text" name="ename" id="ename"></td>
+    </tr>
+    <tr>
+        <td>职位</td>
+        <td><input type="text" name="job" id="job"></td>
+    </tr>
+    <tr>
+        <td>领导工号</td>
+        <td><input type="text" name="mgr" id="mgr"></td>
+    </tr>
+    <tr>
+        <td>入职日期</td>
+        <td><input type="date" name="hiredate" id="hiredate"></td>
+    </tr>
+    <tr>
+        <td>薪金</td>
+        <td><input type="text" name="sal" id="sal"></td>
+    </tr>
+    <tr>
+        <td>佣金</td>
+        <td><input type="text" name="comm" id="comm"></td>
+    </tr>
+    <tr>
+        <td>部门</td>
+        <td>
+            <select id="dept" name="deptno" style="width: 175px;">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><button id="empyes">提交</button></td>
+        <td><button id="empno">清空</button></td>
+    </tr>
+</table>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $("#empyes").click(function(){
+        $.ajax({
+            type: "post",
+            url: "http://localhost:8080/HRMP_war_exploded/EmpSaveServlet",
+            async: true,
+            data: {
+                "empno": $("#empno").val(),
+                "ename": $("#ename").val(),
+                "job": $("#job").val(),
+                "mgr": $("#mgr").val(),
+                "hiredate": $("#hiredate").val(),
+                "sal": $("#sal").val(),
+                "comm": $("#comm").val(),
+                "deptno": $("#dept option:selected").val()
+            },
+            success: function(res) {
+                var jsonResult = JSON.parse(res);
+                if(jsonResult.code == 200){
+                    window.location.href = "http://localhost:8080/HRMP_war_exploded/emp_main.html";
+                    sessionStorage.clear();
+                } else {
+                    window.location.href = "http://localhost:8080/HRMP_war_exploded/error.html";
+                }
+            },
+            error: function(err) {
+                alert("no data");
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

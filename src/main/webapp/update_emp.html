@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>新员工添加页</title>
+</head>
+<body>
+<h1>更新员工信息</h1>
+<table>
+
+    <tr>
+        <td>员工名</td>
+        <td><input type="text" name="ename" id="ename"></td>
+    </tr>
+    <tr>
+        <td>职位</td>
+        <td><input type="text" name="job" id="job"></td>
+    </tr>
+    <tr>
+        <td>领导工号</td>
+        <td><input type="text" name="mgr" id="mgr"></td>
+    </tr>
+    <tr>
+        <td>入职日期</td>
+        <td><input type="date" name="hiredate" id="hir"></td>
+    </tr>
+    <tr>
+        <td>部门编号</td>
+        <td>
+            <select id="dept" name="deptno">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><button id="updateyes">确定</button></td>
+    </tr>
+</table>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $("#ename").attr("value", sessionStorage.ename);
+    $("#job").attr("value", sessionStorage.job);
+    $("#mgr").attr("value", sessionStorage.mgr);
+    $("#hir").attr("value", sessionStorage.hiredate);
+    $("#deptno").attr("value", sessionStorage.deptno);
+    var empno = sessionStorage.empno;
+    var sal = sessionStorage.sal;
+    var comm = sessionStorage.comm;
+    $("#updateyes").click(function(){
+        $.ajax({
+            type:"post",
+            url:"http://localhost:8080/HRMP_war_exploded/EmpUpdateServlet",
+            async:true,
+            data:{
+                "empno":empno,
+                "ename": $("#ename").val(),
+                "job": $("#job").val(),
+                "mgr": $("#mgr").val(),
+                "hiredate": $("#hir").val(),
+                "sal":sal,
+                "comm":comm,
+                "deptno": $("#dept option:selected").val()
+            },
+            success:function(res){
+                var jsonResult = JSON.parse(res);
+                if (jsonResult.code == 200) {
+                    window.location.href = "http://localhost:8080/HRMP_war_exploded/emp_main.html";
+                    sessionStorage.clear();
+                } else{
+                    window.location.href = "http://localhost:8080/HRMP_war_exploded/error.html";
+                }
+            },
+            error: function(err) {
+                alert("no data");
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

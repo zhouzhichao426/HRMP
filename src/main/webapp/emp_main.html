@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html ng-app="empApp">
+
+<head>
+    <meta charset="utf-8">
+    <title>员工列表页</title>
+</head>
+
+<body ng-controller="empCtrl">
+<h1>欢迎{{username}}!</h1>
+<ul>
+    <li ng-repeat="emp in emps">
+        <p id="empno">empno:{{emp.empno}}</p>
+        <p>ename:{{emp.ename}}</p>
+        <p>sal:{{emp.sal}}</p>
+        <p>
+            <button id="updateBtn" ng-click="upd(emp)">更新</button>
+            <button id="deleteBtn" ng-click="del(emp.empno)">删除</button>
+        </p>
+        <hr/>
+    </li>
+</ul>
+<hr/>
+<div ng-view=""></div>
+<a href="http://localhost:8080/HRMP_war_exploded/new_emp.html">添加新员工</a>
+<hr/>
+<div ng-controller="find">
+    <select id="sel" name="" ng-model="queryType">
+        <option value="empno">员工编号</option>
+        <option value="ename">员工姓名(模糊查询)</option>
+    </select>
+    <input type="text" id="qtx">
+    <button id="queryBtn">查询</button>
+</div>
+<script src="https://cdn.bootcss.com/angular.js/1.7.5/angular.min.js"></script>
+<script src="https://cdn.bootcss.com/angular.js/1.7.5/angular-route.js"></script>
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+    var app = angular.module("empApp", ['ngRoute']);
+    app.service('empFac', function() {
+        var emps = null;
+        return {
+            emps:emps
+        }
+    });
+    app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+        $locationProvider.hashPrefix('');
+        $routeProvider.when('/findById',{
+            templateUrl:"findId.html",
+            controller:"findById"
+        }).when('/findByName',{
+            templateUrl:"findByName.html",
+            controller:"findByName"
+        });
+    }]);
+    app.controller("findById", function($scope, $http, empFac) {
+        $scope.emps = empFac.emps;
+    });
+    app.controller("findByName", function($scope, $http, empFac) {
+        $scope.emps = empFac.emps;
+    });
+    app.controller("empCtrl", ['$scope', '$http', function($scope, $http,empFac) {
+        $scope.username = sessionStorage.username;
+        $http.get("http://localhost:8080/HRMP_war_exploded/EmpFindAllServlet").then(function(res) {
+            //$http.get("json/emps.json")
+            $scope.emps = res.data.data;
+            //删除
+            $scope.del = function(empno) {
+                var a = confirm("确认删除吗？");
+                if(a == true) {
+                    $http.get("http://localhost:8080/HRMP_war_exploded/EmpDeleteServlet?empno=" + empno).then(function(res) {
+
+                        alert("delete success!");
+                        window.location.reload();
+
+                    }, function(err) {
+                        alert("delete error");
+                    });
+                } else {
+                    return;
+                }
+            }
+            //更新
+            $scope.upd = function(emp) {
+                sessionStorage.empno = emp.empno;
+                sessionStorage.ename = emp.ename;
+                sessionStorage.job = emp.job;
+                sessionStorage.mgr = emp.mgr;
+                sessionStorage.hirdate = emp.hirdate;
+                sessionStorage.sal = emp.sal;
+                sessionStorage.comm = emp.comm;
+                sessionStorage.deptno = emp.deptno;
+                window.location.href = "http://localhost:8080/HRMP_war_exploded/update_emp.html";
+            }
+        }, function(err) {
+            sessionStorage.errCode = "404";
+            sessionStorage.errMsg = "findAll error！";
+            window.location.href = "http://localhost:8080/HRMP_war_exploded/error.html";
+        });
+
+    }]);
+    app.controller('find', function($scope, $http, empFac) {
+        $("#queryBtn").click(function(){
+            if($("#sel option:selected").val() == "empno") {
+                var findUrl = "http://localhost:8080/HRMP_war_exploded/EmpFindByIdServlet?empno=" + $("#qtx").val();
+                var findhref = "#/findById";
+            } else if($("#sel option:selected").val() == "ename") {
+                var findUrl = "http://localhost:8080/HRMP_war_exploded/EmpFindByNameServlet?ename=" + $("#qtx").val();
+                var findhref = "#/findByName";
+            }
+            $http.get(findUrl).then(function(res) {
+                $("ul").empty();
+                empFac.emps = res.data.data;
+                window.location.href = findhref;
+            }, function(err) {
+                return;
+            });
+        });
+    });
+</script>
+</body>
+
+</html>
